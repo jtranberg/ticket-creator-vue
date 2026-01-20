@@ -121,23 +121,26 @@ export const useTicketsStore = defineStore("tickets", {
     },
 
     updateTicket(id: string, patch: Partial<Omit<Ticket, "id" | "createdAt">>) {
-      const i = this.tickets.findIndex((t) => t.id === id);
-      if (i === -1) return false;
+  const i = this.tickets.findIndex((t) => t.id === id);
+  if (i === -1) return false;
 
-      const updated: Ticket = {
-        ...this.tickets[i],
-        ...patch,
-        updatedAt: now(),
-      };
+  const current = this.tickets[i]!; // ✅ tells TS “it exists”
 
-      this.tickets.splice(i, 1, updated);
-      saveToStorage(this.tickets);
-      return true;
-    },
+  const updated: Ticket = {
+    ...current,
+    ...patch,
+    updatedAt: now(),
+  };
 
-    removeTicket(id: string) {
-      this.tickets = this.tickets.filter((t) => t.id !== id);
-      saveToStorage(this.tickets);
-    },
+  this.tickets.splice(i, 1, updated);
+  saveToStorage(this.tickets);
+  return true;
+},
+removeTicket(id: string) {
+  this.tickets = this.tickets.filter((t) => t.id !== id);
+  saveToStorage(this.tickets);
+}
+
+
   },
 });
